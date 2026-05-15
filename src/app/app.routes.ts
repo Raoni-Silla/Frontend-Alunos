@@ -21,7 +21,7 @@ export const routes: Routes = [
           .then(m => m.ProfessorComponent)
     },
     {
-      path: 'atividades',
+      path: 'atividade',
       component: AtividadeGruposComponent
     },
     {

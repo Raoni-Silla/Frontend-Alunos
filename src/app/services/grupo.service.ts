@@ -9,13 +9,12 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class GrupoService {
-
   private api!: string;
   private api2!: string;
 
   constructor(
     private http: HttpClient,
-    private config: ConfigService
+    private config: ConfigService,
   ) {
     this.api = this.config.getApi('grupos');
     this.api2 = this.config.getApi('grupos-usuarios');
@@ -34,11 +33,10 @@ export class GrupoService {
   }
 
   resetarTodosGrupos() {
-  return this.http.post(`${this.api2}/reset-posicoes`, {});
-}
+    return this.http.post(`${this.api2}/reset-posicoes`, {});
+  }
 
-resetarGrupo(idGrupo: number) {
-  return this.http.post(`${this.api2}/${idGrupo}/reset-posicoes`, {});
-}
-
+  resetarGrupo(idGrupo: number) {
+    return this.http.post(`${this.api2}/${idGrupo}/reset-posicoes`, {});
+  }
 }

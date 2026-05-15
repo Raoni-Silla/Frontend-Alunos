@@ -119,6 +119,7 @@ export class AtividadeGruposComponent implements OnInit {
   carregarGrupos() {
     this.grupoService.listarTodosGrupos().subscribe({
       next: (dados) => {
+        console.log("DADOS QUE CHEGARAM AI: " , dados)
         this.grupos = dados.map((g: any) => {
           const usuariosValidos = (g.usuarios || []).filter(
             (u: any) => u && u.nomeUsuario && u.nomeUsuario.trim() !== '',

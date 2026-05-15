@@ -1,18 +1,19 @@
 <div class="page-bg">
   <div class="container-fluid py-4 px-4 page-content">
-    <app-header title="Painel do Professor" subtitle="Gerencie seus grupos de estudo" backLink="/professor">
+    <app-header
+      title="Painel do Professor"
+      subtitle="Gerencie seus grupos de estudo"
+      backLink="/professor"
+    >
     </app-header>
 
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
       <div>
         <h4 class="fw-semibold mb-1 atividade-titulo">{{ nomeAtividade }}</h4>
-        <small class="text-muted atividade-subtitulo">
-          {{ grupos.length }} grupos criados
-        </small>
+        <small class="text-muted atividade-subtitulo"> {{ grupos.length }} grupos criados </small>
       </div>
 
       <div class="d-flex gap-2 btn-acao">
-
         <button class="btn btn-primary" (click)="atualizarGrupos()">
           <i class="bi bi-arrow-clockwise"></i> Atualizar grupos
         </button>
@@ -37,7 +38,6 @@
       <div class="col-lg-4 col-md-6 px-4" *ngFor="let grupo of grupos">
         <div class="card grupo-card">
           <div class="card-body d-flex flex-column">
-
             <div class="d-flex align-items-center justify-content-between mb-2">
               <div class="d-flex align-items-center gap-2">
                 <div class="grupo-icon">
@@ -51,7 +51,10 @@
                   <i class="bi bi-pencil"></i>
                 </button>
 
-                <button class="btn btn-outline-danger btn-sm" (click)="abrirConfirmacaoResetGrupo(grupo.idGrupo)">
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="abrirConfirmacaoResetGrupo(grupo.idGrupo)"
+                >
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -66,11 +69,8 @@
                 <i class="bi bi-person"></i> {{ aluno.nomeUsuario }}
               </li>
 
-              <li *ngIf="grupo.usuarios.length === 0" class="text-muted">
-                Nenhum aluno ainda
-              </li>
+              <li *ngIf="grupo.usuarios.length === 0" class="text-muted">Nenhum aluno ainda</li>
             </ul>
-
           </div>
         </div>
       </div>
@@ -82,8 +82,12 @@
         <h5 class="fw-bold mb-3">Editar Nome do Grupo</h5>
         <div class="mb-3">
           <label class="form-label">Novo nome</label>
-          <input type="text" class="form-control" [(ngModel)]="grupoSelecionado.nomeGrupo"
-            (keyup.enter)="salvarGrupo()" />
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="grupoSelecionado.nomeGrupo"
+            (keyup.enter)="salvarGrupo()"
+          />
         </div>
         <div class="d-flex justify-content-end gap-2">
           <button class="btn btn-outline-secondary" (click)="fecharModal()">Cancelar</button>
@@ -98,7 +102,9 @@
         <h4 class="fw-bold">Limpar todos os grupos?</h4>
         <p class="text-muted">Essa ação remove todos os alunos dos grupos.</p>
         <div class="d-flex gap-2 justify-content-center mt-3">
-          <button class="btn btn-outline-secondary" (click)="ModalResetTodos = false">Cancelar</button>
+          <button class="btn btn-outline-secondary" (click)="ModalResetTodos = false">
+            Cancelar
+          </button>
           <button class="btn btn-danger" (click)="confirmarResetTodos()">Confirmar</button>
         </div>
       </div>
@@ -110,7 +116,9 @@
         <h4 class="fw-bold">Limpar este grupo?</h4>
         <p class="text-muted">Os alunos serão removidos deste grupo.</p>
         <div class="d-flex gap-2 justify-content-center mt-3">
-          <button class="btn btn-outline-secondary" (click)="ModalResetGrupo = false">Cancelar</button>
+          <button class="btn btn-outline-secondary" (click)="ModalResetGrupo = false">
+            Cancelar
+          </button>
           <button class="btn btn-danger" (click)="confirmarResetGrupo()">Confirmar</button>
         </div>
       </div>
@@ -119,57 +127,52 @@
     <!-- Modal de Loading -->
     <div class="modal-custom" [class.ativo]="ModalSucesso">
       <div class="modal-card text-center">
-
         <div class="spinner-border text-danger custom-spinner mb-3" role="status">
           <span class="visually-hidden">Carregando...</span>
         </div>
 
         <h4 class="fw-bold">Limpando grupos...</h4>
 
-        <p class="text-muted">
-          Aguarde enquanto atualizamos os dados
-        </p>
-
+        <p class="text-muted">Aguarde enquanto atualizamos os dados</p>
       </div>
     </div>
 
     <!-- Modal Erro -->
     <div class="modal-custom" [class.ativo]="ModalErro">
       <div class="modal-card text-center">
-
         <div class="err-icon mb-3">
           <i class="bi bi-x-circle-fill"></i>
         </div>
 
         <h4 class="fw-bold">Erro ao limpar</h4>
 
-        <p class="text-muted">
-          Não foi possível realizar a ação.
-        </p>
-
+        <p class="text-muted">Não foi possível realizar a ação.</p>
       </div>
     </div>
 
     <!-- Modal Atualizar -->
     <div class="modal-custom" [class.ativo]="ModalAtualizar">
       <div class="modal-card text-center">
-
         <div class="spinner-border text-primary custom-spinner mb-3" role="status">
           <span class="visually-hidden">Atualizando...</span>
         </div>
 
         <h4 class="fw-bold">Atualizando grupos...</h4>
 
-        <p class="text-muted">
-          Aguarde enquanto buscamos os dados mais recentes
-        </p>
-
+        <p class="text-muted">Aguarde enquanto buscamos os dados mais recentes</p>
       </div>
     </div>
 
-    <div class="modal-backdrop-custom"
-      *ngIf="modalAberto || ModalResetGrupo || ModalResetTodos || ModalSucesso || ModalErro || ModalAtualizar">
-    </div>
-
+    <div
+      class="modal-backdrop-custom"
+      *ngIf="
+        modalAberto ||
+        ModalResetGrupo ||
+        ModalResetTodos ||
+        ModalSucesso ||
+        ModalErro ||
+        ModalAtualizar
+      "
+    ></div>
   </div>
 </div>

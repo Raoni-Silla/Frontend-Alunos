@@ -27,6 +27,7 @@ export class SessaoGruposComponent implements OnInit {
   ModalConfirmacao = false;
   ModalSucesso = false;
   ModalErro = false;
+  ModalRandom = false;
 
   constructor(
     private router: Router,
@@ -113,5 +114,48 @@ export class SessaoGruposComponent implements OnInit {
         }, 2500);
       },
     });
+  }
+
+  /**
+   * Sorteia aleatoriamente um grupo com vagas disponíveis e prepara o modal de confirmação.
+   * 
+   * O método verifica a lista de grupos e filtra apenas aqueles onde a quantidade
+   * atual de usuários é menor que a capacidade máxima (qtdePessoas).
+   * 
+   * Comportamentos:
+   * - Caso todos os grupos estejam cheios: Exibe o modal de erro (ModalErro).
+   * - Caso haja vagas: Seleciona um grupo de forma aleatória, armazena seu ID e nome
+   *   no estado do componente, e aciona o modal de confirmação para o usuário (ModalRandom).
+   * 
+   * @returns {void} Não retorna nenhum valor, apenas altera o estado visual do componente.
+   */
+ 
+  abrirConfirmacaoEntradaAleatoria() {
+    // 1. Filtra os grupos com vaga
+    const gruposComVaga = this.grupos.filter((grupo) => grupo.qtdeUsuarios < grupo.qtdePessoas);
+
+    // 2. Se não tiver vaga, mostra erro e para aqui mesmo
+    if (gruposComVaga.length === 0) {
+     this.ModalErro = true;
+      setTimeout(() => {
+        this.ModalErro = false;
+        this.cdr.detectChanges(); 
+      }, 2500);
+       
+      this.cdr.detectChanges();
+      return; 
+    }
+
+    console.log(gruposComVaga);
+
+    // 3. Sorteia um grupo
+    const indiceSorteado = Math.floor(Math.random() * gruposComVaga.length);
+    const grupoSorteado = gruposComVaga[indiceSorteado];
+
+    // 4. Salva os dados do grupo sorteado nas variáveis
+    this.grupoSelecionadoId = grupoSorteado.idGrupo;
+    this.nomeGrupoSelecionado = grupoSorteado.nomeGrupo;
+
+    this.ModalRandom = true;
   }
 }

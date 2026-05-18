@@ -1,32 +1,35 @@
 <div class="page-bg">
   <div class="container-fluid py-4 px-4 page-content">
+    <app-header title="Painel do Aluno" subtitle="Grupos" backLink="/aluno"></app-header>
 
-    <app-header title="Painel do Aluno" subtitle="Grupos" backLink="/aluno">
-    </app-header>
-
+    <!-- Cabeçalho: Título na esquerda e Botões na direita -->
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <!-- Título -->
       <div>
         <h4 class="fw-semibold mb-1 atividade-titulo">{{ nomeAtividade }}</h4>
         <small class="text-muted atividade-subtitulo">
           {{ grupos.length }} grupos disponíveis
         </small>
       </div>
+
+      <!-- Botões de Ação -->
+      <div class="d-flex flex-wrap gap-2 btn-acao">
+        <button class="btn btn-primary"  (click)="abrirConfirmacaoEntradaAleatoria()">
+          <i class="bi bi-shuffle"></i> Entrar Aleatório
+        </button>
+      </div>
     </div>
 
-    <!-- Grupos -->
+    <!-- Grid de Grupos -->
     <div class="row g-2">
       <div class="col-lg-4 col-md-6 px-4" *ngFor="let grupo of grupos">
-
         <div class="card grupo-card h-100">
-
           <div class="card-body d-flex flex-column">
-
             <div class="d-flex align-items-center justify-content-between mb-2">
               <div class="d-flex align-items-center gap-2">
                 <div class="grupo-icon">
                   <i class="bi bi-people-fill"></i>
                 </div>
-
                 <h5 class="mb-0 fw-bold">
                   {{ grupo.nomeGrupo }}
                 </h5>
@@ -41,20 +44,18 @@
               <li *ngFor="let aluno of grupo.usuarios" class="aluno-item">
                 <i class="bi bi-person"></i> {{ aluno.nomeUsuario }}
               </li>
-
-              <li *ngIf="grupo.usuarios.length === 0" class="text-muted">
-                Nenhum aluno ainda
-              </li>
+              <li *ngIf="grupo.usuarios.length === 0" class="text-muted">Nenhum aluno ainda</li>
             </ul>
 
-            <button *ngIf="grupo.qtdeUsuarios < grupo.qtdePessoas" class="btn btn-primary-action w-100 mt-auto"
-              (click)="abrirConfirmacao(grupo)">
+            <button
+              *ngIf="grupo.qtdeUsuarios < grupo.qtdePessoas"
+              class="btn btn-primary-action w-100 mt-auto"
+              (click)="abrirConfirmacao(grupo)"
+            >
               Entrar no grupo
             </button>
-
           </div>
         </div>
-
       </div>
     </div>
 
@@ -62,22 +63,38 @@
     <div class="modal-custom" [class.ativo]="ModalConfirmacao">
       <div class="modal-card text-center">
         <i class="bi bi-question-circle-fill text-success fs-1 mb-3"></i>
-
         <h4 class="fw-bold">Confirmar entrada?</h4>
-
         <p class="text-muted">
           Você deseja entrar no grupo
-          <span class="fw-semibold">{{ nomeGrupoSelecionado }}</span>?
+          <span class="fw-semibold">{{ nomeGrupoSelecionado }}</span
+          >?
         </p>
-
         <div class="d-flex gap-2 justify-content-center mt-4">
           <button class="btn btn-outline-secondary" (click)="ModalConfirmacao = false">
             Cancelar
           </button>
+          <button class="btn btn-primary-action" (click)="confirmarGrupo()">Sim, entrar</button>
+        </div>
+      </div>
+    </div>
 
-          <button class="btn btn-primary-action" (click)="confirmarGrupo()">
-            Sim, entrar
-          </button>
+    <!-- Modal de Confirmação aleatorio -->
+    <div class="modal-custom" [class.ativo]="ModalRandom">
+      <!-- CORREÇÃO 1 AQUI -->
+      <div class="modal-card text-center">
+        <!-- Mudei o ícone pra um de embaralhar (shuffle) pra dar a ideia de aleatório -->
+        <i class="bi bi-shuffle text-success fs-1 mb-3"></i>
+
+        <h4 class="fw-bold">Sorteio realizado!</h4>
+        <p class="text-muted">
+          O sistema escolheu o grupo
+          <span class="fw-semibold">{{ nomeGrupoSelecionado }}</span> para você. Deseja entrar?
+        </p>
+
+        <div class="d-flex gap-2 justify-content-center mt-4">
+          <button class="btn btn-outline-secondary" (click)="ModalRandom = false">Cancelar</button>
+          <button class="btn btn-primary-action" (click)="confirmarGrupo()">Sim, entrar</button>
+          <!-- CORREÇÃO 2 AQUI -->
         </div>
       </div>
     </div>
@@ -85,44 +102,29 @@
     <!-- Modal de Loading -->
     <div class="modal-custom" [class.ativo]="ModalSucesso">
       <div class="modal-card text-center">
-
         <div class="spinner-border text-success custom-spinner mb-3" role="status">
           <span class="visually-hidden">Carregando...</span>
         </div>
-
         <h4 class="fw-bold">Entrando no grupo...</h4>
-
         <p class="text-muted">
           <span class="fw-semibold">{{ nomeGrupoSelecionado }}</span>
         </p>
-
-        <p class="text-muted small">
-          Aguarde enquanto atualizamos os grupos
-        </p>
-
+        <p class="text-muted small">Aguarde enquanto atualizamos os grupos</p>
       </div>
     </div>
 
     <!-- Modal de Erro -->
     <div class="modal-custom" [class.ativo]="ModalErro">
       <div class="modal-card text-center">
-
         <div class="err-icon mb-3">
           <i class="bi bi-x-circle-fill"></i>
         </div>
-
         <h4 class="fw-bold">Erro ao entrar</h4>
-
-        <p class="text-muted">
-          Não foi possível entrar no grupo.
-        </p>
-
+        <p class="text-muted">Não foi possível entrar no grupo.</p>
       </div>
     </div>
 
     <!-- Backdrop -->
-    <div class="modal-backdrop-custom" *ngIf="ModalConfirmacao || ModalSucesso || ModalErro">
-    </div>
-
+    <div class="modal-backdrop-custom" *ngIf="ModalConfirmacao || ModalSucesso || ModalErro"></div>
   </div>
 </div>

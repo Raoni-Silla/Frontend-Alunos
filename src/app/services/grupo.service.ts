@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { GruposDTO } from '../models/grupos-dto';
 import { GrupoUsuario } from '../models/grupo-usuario';
 import { ConfigService } from './config.service';
+import { moverAlunoForm } from '../models/MoverAlunoForm';
+import { AdicionarNovoAlunoForm } from '../models/AdicionarNovoAlunoForm';
 
 @Injectable({
   providedIn: 'root',
@@ -39,4 +41,13 @@ export class GrupoService {
   resetarGrupo(idGrupo: number) {
     return this.http.post(`${this.api2}/${idGrupo}/reset-posicoes`, {});
   }
+
+  moverAluno(moverAlunoForm : moverAlunoForm){
+    return this.http.post(`${this.api2}/mover-aluno-grupo`, moverAlunoForm)
+  }
+
+  adicionarNovoAluno(novoAlunoForm: AdicionarNovoAlunoForm){
+    return this.http.post(`${this.api2}/adicionar-aluno`,novoAlunoForm)
+  }
+
 }

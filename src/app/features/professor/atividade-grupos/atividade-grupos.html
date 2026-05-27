@@ -34,7 +34,7 @@
     </div>
 
     <!-- Grupos -->
-    
+
     <div class="row g-2" cdkDropListGroup>
       <div class="col-lg-4 col-md-6 px-4" *ngFor="let grupo of grupos">
         <div class="card grupo-card">
@@ -48,6 +48,14 @@
               </div>
 
               <div class="d-flex gap-1">
+                <button
+                  class="btn btn-light btn-sm"
+                  (click)="abrirModalEdicaoNome(grupo.idGrupo)"
+                  *ngIf="grupo.qtdeUsuarios < grupo.qtdePessoas"
+                >
+                  <i class="bi bi-plus"></i>
+                </button>
+
                 <button class="btn btn-light btn-sm" (click)="abrirEdicao(grupo)">
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -65,21 +73,20 @@
               {{ grupo.qtdeUsuarios }} / {{ grupo.qtdePessoas }} pessoas
             </p>
 
-           
             <ul
               class="list-unstyled flex-grow-1 mb-3 area-drop"
               cdkDropList
               [cdkDropListData]="grupo.usuarios"
-              (cdkDropListDropped)="onDrop($event, grupo.idGrupo)"
+              (cdkDropListDropped)="onDrop($event)"
+              [id]="grupo.idGrupo.toString()"
             >
-             
               <li
                 *ngFor="let aluno of grupo.usuarios"
                 class="aluno-item arrastavel d-flex justify-content-between align-items-center"
                 cdkDrag
               >
                 <div><i class="bi bi-person me-1"></i> {{ aluno.nomeUsuario }}</div>
-               
+
                 <i class="bi bi-grip-vertical text-muted"></i>
               </li>
               <li
@@ -110,6 +117,58 @@
         <div class="d-flex justify-content-end gap-2">
           <button class="btn btn-outline-secondary" (click)="fecharModal()">Cancelar</button>
           <button class="btn btn-primary" (click)="salvarGrupo()">Salvar Alteração</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-custom" [class.ativo]="ModalAdicionarAluno">
+      <div class="modal-card">
+        <h5 class="fw-bold mb-4">Coloque o nome do novo aluno</h5>
+
+        <div class="mb-4">
+          <label class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="nome?.trim() && nome.trim().length < 3"
+            [(ngModel)]="nome"
+            (keyup.enter)="adicionarAlunoNoGrupo()"
+          />
+          <small class="text-danger" *ngIf="nome?.trim() && nome.trim().length < 3">
+            O nome precisa ter no mínimo 3 letras.
+          </small>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Sobrenome</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="sobrenome?.trim() && sobrenome.trim().length < 3"
+            [(ngModel)]="sobrenome"
+            (keyup.enter)="adicionarAlunoNoGrupo()"
+          />
+          <small class="text-danger" *ngIf="sobrenome?.trim() && sobrenome.trim().length < 3">
+            O sobrenome precisa ter no mínimo 3 letras.
+          </small>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button class="btn btn-outline-secondary" (click)="fecharModalAluno()">Cancelar</button>
+
+          <button
+            class="btn btn-primary"
+            (click)="adicionarAlunoNoGrupo()"
+            [disabled]="
+              !nome?.trim() ||
+              nome.trim().length < 3 ||
+              !sobrenome?.trim() ||
+              sobrenome.trim().length < 3 ||
+              salvando
+            "
+          >
+            {{ salvando ? 'Adicionando...' : 'Adicionar Novo Aluno' }}
+          </button>
         </div>
       </div>
     </div>
@@ -168,6 +227,19 @@
       </div>
     </div>
 
+    <!-- Modal Erro -->
+    <div class="modal-custom" [class.ativo]="ModalErroDragAndDrop">
+      <div class="modal-card text-center">
+        <div class="err-icon mb-3">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+
+        <h4 class="fw-bold">ERRO</h4>
+
+        <p class="text-muted">Não foi possível trocar esse aluno de grupo</p>
+      </div>
+    </div>
+
     <!-- Modal Atualizar -->
     <div class="modal-custom" [class.ativo]="ModalAtualizar">
       <div class="modal-card text-center">
@@ -189,7 +261,8 @@
         ModalResetTodos ||
         ModalSucesso ||
         ModalErro ||
-        ModalAtualizar
+        ModalAtualizar ||
+        ModalAdicionarAluno
       "
     ></div>
   </div>

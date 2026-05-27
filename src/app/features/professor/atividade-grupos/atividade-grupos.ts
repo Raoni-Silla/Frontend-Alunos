@@ -13,6 +13,8 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { moverAlunoForm } from '../../../models/MoverAlunoForm';
+import { AdicionarNovoAlunoForm } from '../../../models/AdicionarNovoAlunoForm';
 
 @Component({
   selector: 'app-atividade-grupos',
@@ -38,6 +40,13 @@ export class AtividadeGruposComponent implements OnInit {
   ModalErro = false;
   ModalAtualizar = false;
   grupoResetId: number | null = null;
+  ModalErroDragAndDrop = false;
+  ModalAdicionarAluno = false;
+  salvando = false;
+
+  nome = '';
+  sobrenome = '';
+  idGrupoSelecionado: number | null = null;
 
   constructor(
     private router: Router,
@@ -204,55 +213,119 @@ export class AtividadeGruposComponent implements OnInit {
   }
 
   /**
-   * Gerencia o evento de arrastar e soltar (Drag and Drop) dos alunos entre os grupos.
+   * @description
+   * Manipula o evento de Drag and Drop (arrastar e soltar) de alunos entre os grupos.
    *
-   * Este método intercepta a ação quando o usuário solta um card de aluno e avalia o contexto:
-   * - Caso de Reordenação: Se o container de origem e destino forem iguais,
-   *   apenas reorganiza a posição do aluno dentro da mesma lista (moveItemInArray).
-   * - Caso de Transferência: Se os containers forem diferentes, remove o aluno da
-   *   lista de origem e o injeta na lista de destino (transferArrayItem),
-   *   acionando o recálculo de vagas na interface.
+   * Se o aluno for movido dentro do mesmo grupo, apenas reordena a lista localmente.
+   * Se for movido para um grupo diferente, realiza a validação de capacidade do grupo de destino,
+   * atualiza a interface (transferência visual) e envia a requisição assíncrona para o back-end
+   * persistir a mudança no banco de dados.
    *
-   * @param {CdkDragDrop<any[]>} event Objeto gerado pelo Angular CDK contendo o estado
-   *        do drag, incluindo os arrays de origem (previousContainer) e destino (container),
-   *        além dos índices inicial e final do item.
-   * 
-   * @param {number} grupoDestinoId Identificador único do grupo onde o aluno foi solto.
-   *        (Pode ser utilizado para persistência via API no banco de dados).
+   * @param {CdkDragDrop<any[]>} event - O evento disparado pelo CDK Drag & Drop contendo os dados do container de origem e destino, além dos índices.
    *
-   * @returns {void} O método não possui retorno, apenas altera o estado interno dos arrays.
+   * @returns {void} Não retorna nada. Em caso de lotação máxima, exibe um modal de erro temporário.
    */
-  onDrop(event: CdkDragDrop<any[]>, grupoDestinoId: number) {
-    //o array atual (previous) é igual o novo array??
+  onDrop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      //descobrimos quem é o aluno olhando o relatorio do event
-      //event.previousContainer.data fala da onde esse aluno saiu
-      //event.previousIndex diz qual era a posição dele aonde ele saiu
+      // Pega os IDs diretamente do evento do CDK (muito mais seguro)
+      const idDestino = Number(event.container.id);
+      const idSaida = Number(event.previousContainer.id);
+
+      const grupoDestino = this.grupos.find((g) => g.idGrupo === idDestino);
+
+      if (grupoDestino && grupoDestino.qtdeUsuarios >= grupoDestino.qtdePessoas) {
+        this.ModalErroDragAndDrop = true;
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.ModalErroDragAndDrop = false;
+          this.cdr.detectChanges();
+        }, 2000);
+        return;
+      }
+
       const alunoSendoMovido = event.previousContainer.data[event.previousIndex];
 
-      //funçao do proprio angular
-      //vai no array antigo . previusContainer.data
-      //ele apaga o aluno movido do array antigo (previousIndex)
-      //depois ele vai no array novo, container.data
-      //abre um espaço novo la e insere o novo aluno (currentIndex)
+      // Atualiza os arrays visualmente
       transferArrayItem(
-        event.previousContainer.data, //array de origem
-        event.container.data, //array de destino
-        event.previousIndex, //posição no array antigo
-        event.currentIndex, //posição no array novo
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
       );
-      //atualiza o numero de pessoas por grupo na tela
-      this.atualizarContagens();
+
+      const moverAlunoForm: moverAlunoForm = {
+        idGrupoDestino: idDestino,
+        idGrupoSaida: idSaida,
+        nomeUsuario: alunoSendoMovido.nomeUsuario,
+      };
+
+      this.grupoService.moverAluno(moverAlunoForm).subscribe({
+        next: () => {
+          this.carregarGrupos();
+        },
+        error: (erro) => {
+          console.error('Erro ao mover aluno no back-end', erro);
+          this.carregarGrupos();
+        },
+      });
     }
   }
 
-  // Função auxiliar para recalcular as vagas na tela
-  atualizarContagens() {
-    this.grupos.forEach((grupo) => {
-      grupo.qtdeUsuarios = grupo.usuarios.length;
-    });
-    this.cdr.detectChanges();
+  abrirModalEdicaoNome(idGrupo: number) {
+    this.ModalAdicionarAluno = true;
+    this.idGrupoSelecionado = idGrupo;
+  }
+
+  /**
+   * Orquestra o fluxo de adição de um novo aluno a um grupo selecionado via modal.
+   * * <p>
+   * Este método é acionado pelo botão de envio do modal e gerencia todo o ciclo de vida da interação:
+   * 1. Trava a interface ativando o estado de carregamento (`salvando = true`).
+   * 2. Monta o objeto (DTO) com o ID do grupo selecionado e os dados digitados (nome e sobrenome).
+   * 3. Dispara a requisição HTTP para o backend via `grupoService`.
+   * 4. Em caso de sucesso, chama o método `carregarGrupos()` para atualizar a tela com os dados novos do banco.
+   * 5. Em ambos os cenários (sucesso ou erro), garante a limpeza dos inputs, o fechamento do modal
+   * e a liberação do botão de envio (`salvando = false`).
+   * </p>
+   * * @throws {Error} Lança uma exceção caso o método seja chamado sem um `idGrupoSelecionado` previamente definido.
+   */
+  adicionarAlunoNoGrupo() {
+    this.salvando = true;
+    if (this.idGrupoSelecionado !== null) {
+      const alunoForm: AdicionarNovoAlunoForm = {
+        idGrupo: this.idGrupoSelecionado,
+        nome: this.nome,
+        sobrenome: this.sobrenome,
+      };
+
+      this.grupoService.adicionarNovoAluno(alunoForm).subscribe({
+        next: (resposta) => {
+          console.log(resposta);
+          this.carregarGrupos();
+          this.ModalAdicionarAluno = false;
+          this.nome = '';
+          this.sobrenome = '';
+          this.salvando = false;
+        },
+        error: (err) => {
+          this.salvando = false;
+          console.error(err);
+          console.log('DEU PAU AI');
+          this.ModalAdicionarAluno = false;
+          this.nome = '';
+          this.sobrenome = '';
+        },
+      });
+    } else {
+      throw new Error('Erro: id do grupo não foi encontrado');
+    }
+  }
+
+  fecharModalAluno() {
+    this.ModalAdicionarAluno = false;
+    this.nome = '';
+    this.sobrenome = '';
   }
 }

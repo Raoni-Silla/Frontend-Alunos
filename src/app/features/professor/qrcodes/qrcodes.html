@@ -16,8 +16,7 @@
           </div>
 
           <div class="session-code mt-2 mb-3" *ngIf="sessionCode">
-            Código da sessão:
-            <span class="code">{{ sessionCode }}</span>
+            Código da sessão: <span class="code">{{ sessionCode }}</span>
 
             <button
               type="button"
@@ -25,7 +24,7 @@
               (click)="copiarCodigo()"
               title="Copiar código"
             >
-              <i class="bi bi-clipboard"></i>
+              <i class="fa" [ngClass]="isCopied ? 'bi-check text-success' : 'bi-clipboard'"></i>
             </button>
           </div>
 

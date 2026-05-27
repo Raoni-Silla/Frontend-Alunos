@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HeaderComponent } from '../../../shared/header/header';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-qrcodes',
@@ -13,6 +14,7 @@ import { HeaderComponent } from '../../../shared/header/header';
 export class QRCodesComponent implements OnInit {
   sessionCode = '';
   qrCodeDataUrl: string | null = null;
+  isCopied = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -41,11 +43,18 @@ export class QRCodesComponent implements OnInit {
 
   copiarCodigo() {
     if (this.sessionCode) {
-      navigator.clipboard.writeText(this.sessionCode).then(() => {
-        alert('Código copiado com sucesso!');
-      }).catch(err => {
-        console.error('Falha ao copiar: ', err);
-      });
+      navigator.clipboard
+        .writeText(this.sessionCode)
+        .then(() => {
+          this.isCopied = true;
+          timer(2000).subscribe(() => {
+            this.isCopied = false;
+          });
+        })
+        .catch((err) => {
+          console.error('Falha ao copiar: ', err);
+          this.isCopied = false;
+        });
     }
   }
 }

@@ -38,4 +38,14 @@ export class QRCodesComponent implements OnInit {
       alert('Link da sessão copiado!');
     });
   }
+
+  copiarCodigo() {
+    if (this.sessionCode) {
+      navigator.clipboard.writeText(this.sessionCode).then(() => {
+        alert('Código copiado com sucesso!');
+      }).catch(err => {
+        console.error('Falha ao copiar: ', err);
+      });
+    }
+  }
 }

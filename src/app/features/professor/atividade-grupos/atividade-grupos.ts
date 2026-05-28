@@ -328,4 +328,26 @@ export class AtividadeGruposComponent implements OnInit {
     this.nome = '';
     this.sobrenome = '';
   }
+
+
+
+  /**
+   * Alterna o tema visual da aplicação entre Claro e Escuro (Light/Dark Mode).
+   * * <p>
+   * Este método inverte o estado da propriedade `isDarkMode` e, com base nesse estado,
+   * altera dinamicamente o atributo `data-bs-theme` na tag raiz do HTML (`<html>`).
+   * * Ao injetar esse atributo no topo do DOM, ele aciona duas coisas simultaneamente:
+   * 1. O suporte nativo de Dark Mode do Bootstrap 5.3+ (para botões, inputs, etc).
+   * 2. O nosso CSS customizado (via `:host-context` e seletores globais) que foi
+   * preparado para reagir a essa mudança de tema.
+   * </p>
+   */
+  
+  isDarkMode = false;
+
+  alternarTema() {
+    this.isDarkMode = !this.isDarkMode;
+    const tema = this.isDarkMode ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-bs-theme', tema);
+  }
 }

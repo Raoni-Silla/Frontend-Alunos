@@ -218,3 +218,90 @@
   background-color: #f8fafc;
   font-size: 0.85rem;
 }
+
+
+/* ==========================================
+   DARK MODE - OVERRIDE DO COMPONENTE
+   ========================================== */
+:host-context([data-bs-theme="dark"]) {
+
+  
+  .grupo-card .btn-light {
+    background-color: #334155;
+    border-color: #475569;
+    color: #f8fafc;
+  }
+
+  .grupo-card .btn-light:hover {
+    background-color: #475569;
+    color: #ffffff;
+  }
+  
+  
+  .page-bg {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 45%, #1e293b 100%);
+    color: #f8fafc;
+  }
+
+ 
+  .grupo-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+  }
+
+  .grupo-card:hover {
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .6);
+  }
+
+  .grupo-card h5 {
+    color: #f8fafc;
+  }
+
+  .grupo-card p {
+    color: #94a3b8;
+  }
+
+
+  .atividade-titulo,
+  .atividade-subtitulo {
+    color: #f8fafc;
+  }
+
+
+  .aluno-item,
+  .aluno-edit-item {
+    background: #334155;
+    color: #e2e8f0;
+  }
+
+  
+  .modal-card {
+    background: #1e293b;
+    color: #f8fafc;
+  }
+
+  .modal-backdrop-custom {
+    background: rgba(0, 0, 0, .75);
+  }
+
+  /* ================================
+     DRAG AND DROP - MODO ESCURO
+     ================================ */
+  
+  .cdk-drag-preview {
+    background: #1e293b;
+    color: #f8fafc;
+    box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.6);
+  }
+
+  .cdk-drag-placeholder {
+    border-color: #475569;
+  }
+
+  .drop-placeholder {
+    border-color: #475569;
+    background-color: rgba(30, 41, 59, 0.5);
+    color: #94a3b8;
+  }
+}

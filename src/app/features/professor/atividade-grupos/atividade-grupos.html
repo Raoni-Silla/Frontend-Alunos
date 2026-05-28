@@ -26,6 +26,11 @@
           <i class="bi bi-qr-code"></i> Gerar QR Codes
         </button>
 
+        <button class="btn btn-outline-secondary" (click)="alternarTema()">
+          <i class="bi" [ngClass]="isDarkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
+          {{ isDarkMode ? ' Tema Claro' : ' Tema Escuro' }}
+        </button>
+
         <button class="btn btn-outline-primary" (click)="exportarPDF()" *ngIf="temAlunos()">
           <i class="bi bi-file-earmark-text"></i>
           Exportar PDF

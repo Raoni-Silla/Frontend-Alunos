@@ -84,3 +84,16 @@ button:disabled {
   box-shadow: 0 0 0 3px rgba(94, 197, 85, 0.25);
 }
 
+/* ==========================================
+   DRAG AND DROP - PREVIEW GLOBAL (DARK MODE)
+   ========================================== */
+[data-bs-theme="dark"] .cdk-drag-preview {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #475569 !important;
+  box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-bs-theme="dark"] .cdk-drag-preview * {
+  color: #f8fafc !important; /* Garante que qualquer texto dentro do preview fique claro */
+}

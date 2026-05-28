@@ -131,10 +131,7 @@ export class SessaoGruposComponent implements OnInit {
    */
  
   abrirConfirmacaoEntradaAleatoria() {
-    // 1. Filtra os grupos com vaga
     const gruposComVaga = this.grupos.filter((grupo) => grupo.qtdeUsuarios < grupo.qtdePessoas);
-
-    // 2. Se não tiver vaga, mostra erro e para aqui mesmo
     if (gruposComVaga.length === 0) {
      this.ModalErro = true;
       setTimeout(() => {
@@ -148,11 +145,9 @@ export class SessaoGruposComponent implements OnInit {
 
     console.log(gruposComVaga);
 
-    // 3. Sorteia um grupo
     const indiceSorteado = Math.floor(Math.random() * gruposComVaga.length);
     const grupoSorteado = gruposComVaga[indiceSorteado];
 
-    // 4. Salva os dados do grupo sorteado nas variáveis
     this.grupoSelecionadoId = grupoSorteado.idGrupo;
     this.nomeGrupoSelecionado = grupoSorteado.nomeGrupo;
 
